@@ -49,6 +49,7 @@ def cargarDatos():
 
 
 
+
                 contDeporte=1
                 for deporteEvento in dicDeportes.values():
                     if (deporteEvento == deporte):
@@ -98,12 +99,82 @@ def cargarDatos():
                     dicParticipaciones[idParticipacion]=participacion
                     idParticipacion+=1
 
-        #print(dicDeportes)
+
+        cn = mysql.Connect(host="127.0.0.1", database="olimpiadas", user="admin", password="password", autocommit=False)
+
+        if cn.is_connected():
+            cursor = cn.cursor()
+
+            deleteParticipacion = "delete from Participacion"
+            deleteEvento = "delete from Evento"
+            deleteDeporte = "delete from Deporte"
+            deleteDeportista = "delete from Deportista"
+            deleteOlimpiada = "delete from Olimpiada"
+            deleteEquipo = "delete from Equipo"
+            cursor.execute(deleteParticipacion)
+            cursor.execute(deleteEvento)
+            cursor.execute(deleteDeporte)
+            cursor.execute(deleteDeportista)
+            cursor.execute(deleteEquipo)
+            cursor.execute(deleteOlimpiada)
+
+
+            for id in dicOlimpiadas:
+                query = "Insert into Olimpiada (id_olimpiada,nombre,anio,temporada,ciudad) values (%s, %s, %s, %s, %s)"
+                datos = dicOlimpiadas.get(id)
+                datosAInsertar = [id, datos[0], datos[1], datos[2], datos[3]]
+                cursor.execute(query, datosAInsertar)
+
+
+
+
+            for id in dicEquipos:
+                query = "Insert into Equipo (id_equipo, nombre, iniciales) values (%s, %s, %s)"
+                datos = dicEquipos.get(id)
+                datosAInsertar = [id, datos[0], datos[1]]
+                cursor.execute(query, datosAInsertar)
+
+
+            for id in dicDeportistas:
+                query = "Insert into Deportista (id_deportista, nombre, sexo, peso, altura) values (%s, %s, %s, %s, %s)"
+                datos = dicDeportistas.get(id)
+                if datos[2]=="NA":
+                    datos[2]=None
+                if datos[3] == "NA":
+                    datos[3] = None
+                datosAInsertar = [id, datos[0], datos[1], datos[2], datos[3]]
+                cursor.execute(query, datosAInsertar)
+
+            for id in dicDeportes:
+                query = "Insert into Deporte (id_deporte, nombre) values (%s,%s)"
+                datos = dicDeportes.get(id)
+                datosAInsertar=[id, datos[0]]
+                cursor.execute(query, datosAInsertar)
+
+            for id in dicEventos:
+                query = "insert into Evento (id_evento, nombre, id_olimpiada, id_deporte) values (%s,%s,%s,%s)"
+                datos = dicEventos.get(id)
+                datosAInsertar= [id, datos[0], datos[1], datos[2]]
+                cursor.execute(query, datosAInsertar)
+
+
+            for id in dicParticipaciones:
+                query = "insert into Participacion values (%s,%s,%s,%s,%s)"
+                datos = dicParticipaciones.get(id)
+                if datos[3] == "NA":
+                    datos[3] = None
+                datosAInsertar= [datos[0],datos[1],datos[2],datos[3],datos[4]]
+                cursor.execute(query, datosAInsertar)
+
+        cn.commit()
         #print(dicEventos)
         #print(dicParticipaciones)
 
 
 cargarDatos()
+print("La carga de la información se ha realizado correctamente")
 
-cn = mysql.Connect(host="127.0.0.1", database="olimpiadas", user="admin", password="password", autocommit=False)
+
+
+
 
